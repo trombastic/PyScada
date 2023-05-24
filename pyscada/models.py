@@ -28,6 +28,7 @@ import os
 if os.name != "nt":
     from os import WNOHANG
 
+from uuid import uuid4
 from struct import *
 from os import getpid
 from dateutil import relativedelta
@@ -858,7 +859,7 @@ class Variable(models.Model):
         (optional) :mod:`pyscada.Color` and (optional) :mod:`pyscada.Dictionary`.
     """
     id = models.AutoField(primary_key=True)
-    name = models.SlugField(max_length=200, verbose_name="variable name", unique=True)
+    name = models.SlugField(max_length=200, verbose_name="variable name", unique=True, default=uuid4)
     description = models.TextField(default="", verbose_name="Description")
     device = models.ForeignKey(Device, null=True, on_delete=models.CASCADE)
     active = models.BooleanField(default=True)
