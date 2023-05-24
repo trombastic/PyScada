@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import traceback
+
 from django.urls import path
 from . import views
 from pyscada.admin import admin_site
 from django.contrib.auth import views as auth_views
+from django.apps import apps
 
 urlpatterns = [
     # Public pages
@@ -27,3 +30,12 @@ urlpatterns = [
     path('form/write_property2/', views.form_write_property2),
     path('view/<link_title>/', views.view, name="main-view"),
 ]
+
+for app in apps.app_configs.values():
+    print(f"{app.name}")
+    if app.name.startswith('pyscada.') and app.name != "pyscada.hmi":
+        try:
+            m = __import__(f"{app.name}.urls", fromlist=[str('a')])
+            urlpatterns += m.urlpatterns
+        except:
+            print(traceback.format_exc())
