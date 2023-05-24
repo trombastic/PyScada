@@ -860,7 +860,7 @@ class Variable(models.Model):
     """
     id = models.AutoField(primary_key=True)
     name = models.SlugField(max_length=200, verbose_name="variable name", unique=True, default=uuid4)
-    description = models.TextField(default="", verbose_name="Description")
+    description = models.TextField(default="", verbose_name="Description", blank=True)
     device = models.ForeignKey(Device, null=True, on_delete=models.CASCADE)
     active = models.BooleanField(default=True)
     unit = models.ForeignKey(Unit, on_delete=models.SET(1))
