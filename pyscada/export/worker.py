@@ -97,11 +97,11 @@ class MasterProcess(BaseProcess):
     def loop(self):
         """
         this function will be called every self.dt_set seconds
-            
+
         request data
-            
-        tm_wday 0=Monday 
-        tm_yday   
+
+        tm_wday 0=Monday
+        tm_yday
         """
         today = date.today()
         # only start new jobs after change the day changed
@@ -116,24 +116,28 @@ class MasterProcess(BaseProcess):
                     start_time = mktime(datetime.strptime(start_time, "%d-%b-%Y %H:%M:%S").timetuple())
                     filename_suffix = 'daily_export_%d_%s' % (job.pk, job.label)
                     add_task = True
+
                 elif job.export_period == 2 and gmtime().tm_yday % 2 == 0:  # on even days (2,4,...)
                     start_time = '%s %02d:00:00' % ((today - timedelta(2)).strftime('%d-%b-%Y'),
                                                     job.day_time)  # "%d-%b-%Y %H:%M:%S"
                     start_time = mktime(datetime.strptime(start_time, "%d-%b-%Y %H:%M:%S").timetuple())
                     filename_suffix = 'two_day_export_%d_%s' % (job.pk, job.label)
                     add_task = True
+
                 elif job.export_period == 7 and gmtime().tm_wday == 0:  # on every monday
                     start_time = '%s %02d:00:00' % ((today - timedelta(7)).strftime('%d-%b-%Y'),
                                                     job.day_time)  # "%d-%b-%Y %H:%M:%S"
                     start_time = mktime(datetime.strptime(start_time, "%d-%b-%Y %H:%M:%S").timetuple())
                     filename_suffix = 'weekly_export_%d_%s' % (job.pk, job.label)
                     add_task = True
+
                 elif job.export_period == 14 and gmtime().tm_yday % 14 == 0:  # on every second monday
                     start_time = '%s %02d:00:00' % ((today - timedelta(14)).strftime('%d-%b-%Y'),
                                                     job.day_time)  # "%d-%b-%Y %H:%M:%S"
                     start_time = mktime(datetime.strptime(start_time, "%d-%b-%Y %H:%M:%S").timetuple())
                     filename_suffix = 'two_week_export_%d_%s' % (job.pk, job.label)
                     add_task = True
+
                 elif job.export_period == 30 and gmtime().tm_yday % 30 == 0:  # on every 30 days
                     start_time = '%s %02d:00:00' % ((today - timedelta(30)).strftime('%d-%b-%Y'),
                                                     job.day_time)  # "%d-%b-%Y %H:%M:%S"
@@ -146,7 +150,9 @@ class MasterProcess(BaseProcess):
                                                   23)  # "%d-%b-%Y %H:%M:%S"
                 else:
                     end_time = '%s %02d:59:59' % (today.strftime('%d-%b-%Y'), job.day_time - 1)  # "%d-%b-%Y %H:%M:%S"
+
                 end_time = mktime(datetime.strptime(end_time, "%d-%b-%Y %H:%M:%S").timetuple())
+
                 # create ExportTask
                 if add_task:
                     et = ExportTask(
@@ -193,6 +199,7 @@ class MasterProcess(BaseProcess):
                 busy=False,
                 failed=False,
                 datetime_start__lte=datetime.now(UTC)).first()  # get all jobs
+
             if job:
                 bp = BackgroundProcess(label='pyscada.export-%d' % job.pk,
                                        message='waiting..',
@@ -211,6 +218,7 @@ class MasterProcess(BaseProcess):
                                              datetime_start__gte=datetime.fromtimestamp(time() + 60 * 24 * 60 * 60,
                                                                                         UTC)):
             job.delete()
+
         # delete all failed jobs older the 60 days
         for job in ExportTask.objects.filter(failed=True,
                                              datetime_start__gte=datetime.fromtimestamp(time() + 60 * 24 * 60 * 60,

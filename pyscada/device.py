@@ -23,9 +23,11 @@ class GenericHandlerDevice:
         self.inst = None
         self._device_not_accessible = 0
         self._not_accessible_reason = None
-        if not hasattr(self, '_protocol'):
+
+        if not hasattr(self, "_protocol"):
             self._protocol = PROTOCOL_ID
-        if not hasattr(self, 'driver_ok'):
+
+        if not hasattr(self, "driver_ok"):
             self.driver_ok = driver_ok
 
     def connect(self):
@@ -40,6 +42,7 @@ class GenericHandlerDevice:
                 p = DeviceProtocol.objects.get(id=self._protocol)
             except DeviceProtocol.DoesNotExist:
                 p = None
+
             logger.warning(f"Wrong handler selected : it's for {p} device while device protocol is {self._device.protocol}")
             return False
 
@@ -49,15 +52,16 @@ class GenericHandlerDevice:
         if self.inst is not None:
             if self._device_not_accessible < 1:
                 self._device_not_accessible = 1
-                logger.info(f'Connected to device : {self._device}')
+                logger.info(f"Connected to device : {self._device}")
         else:
             if self._device_not_accessible > -1:
                 self._device_not_accessible = -1
-                msg = f'Device {self._device} is not accessible.'
+                msg = f"Device {self._device} is not accessible."
                 if self._not_accessible_reason is not None:
                     msg += f" Reason : {self._not_accessible_reason}"
                     self._not_accessible_reason = None
                 logger.info(msg)
+
         return True
 
     def disconnect(self):
@@ -101,6 +105,7 @@ class GenericHandlerDevice:
 
                 if value is not None and item.update_value(value, read_time):
                     output.append(item.create_recorded_data_element())
+
         self.after_read()
         return output
 
@@ -115,7 +120,7 @@ class GenericHandlerDevice:
                     logger.warning(f"Handler of {self._device} should overwrite write_data function.")
                     return None
 
-            logger.warning(f'Variable {variable_id} not in variable list {self._variables} of device {self._device}')
+            logger.warning(f"Variable {variable_id} not in variable list {self._variables} of device {self._device}")
         return None
 
     def time(self):
@@ -130,25 +135,31 @@ class GenericDevice:
     def __init__(self, device):
         self.variables = {}
         self.device = device
-        if not hasattr(self, 'driver_ok'):
+        if not hasattr(self, "driver_ok"):
             self.driver_ok = driver_ok
 
         if not self.driver_ok:
-            logger.warning(f'Driver import failed for {self.device}')
+            logger.warning(f"Driver import failed for {self.device}")
 
         try:
-            if hasattr(self.device, 'instrument_handler') \
-                    and self.device.instrument_handler is not None:
+            if hasattr(self.device, "instrument_handler") \
+               and self.device.instrument_handler is not None:
+
                 if self.device.instrument_handler.handler_path is not None:
                     sys.path.append(self.device.instrument_handler.handler_path)
-                mod = __import__(self.device.instrument_handler.handler_class, fromlist=['Handler'])
-                device_handler = getattr(mod, 'Handler')
+
+                mod = __import__(self.device.instrument_handler.handler_class, fromlist=["Handler"])
+                device_handler = getattr(mod, "Handler")
                 self._h = device_handler(self.device, self.variables)
+
             elif hasattr(self, "handler_class"):
                 self._h = self.handler_class(self.device, self.variables)
+
             else:
                 self._h = GenericHandlerDevice(self.device, self.variables)
+
             self.driver_handler_ok = True
+
         except ImportError:
             self.driver_handler_ok = False
             logger.error(f"Handler import error : {self.device.short_name}", exc_info=True)
@@ -157,7 +168,7 @@ class GenericDevice:
         sleep(5)
 
         for var in self.device.variable_set.filter(active=1):
-            if not hasattr(var, str(self.device.protocol.protocol) + 'variable'):
+            if not hasattr(var, f"{str(self.device.protocol.protocol)}variable):
                 continue
             self.variables[var.pk] = var
 
@@ -190,3 +201,4 @@ class GenericDevice:
                 if read_value is not None and self.variables[item].update_value(read_value, time_ns() / 1000000000):
                     output.append(self.variables[item].create_recorded_data_element())
         return output
+´

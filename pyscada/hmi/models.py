@@ -237,25 +237,23 @@ class ControlItem(models.Model):
                 type_str = i[1]
 
         if self.variable_property:
-            return self.id.__str__() + "-" + type_str.replace(' ', '_') + "-" + self.label.replace(' ', '_') + "-" + \
-                   self.variable_property.name.replace(' ', '_')
+            return f"{self.id.__str__()}-{type_str.replace(' ', '_')}-{self.label.replace(' ', '_')}-{self.variable_property.name.replace(' ', '_')}"
         elif self.variable:
-            return self.id.__str__() + "-" + type_str.replace(' ', '_') + "-" + "-" + self.label.replace(' ', '_') + "-" + "-" + \
-                   self.variable.name.replace(' ', '_')
+            return f"{self.id.__str__()}-{type_str.replace(' ', '_')}--{self.label.replace(' ', '_')}--{self.variable.name.replace(' ', '_')}"
         else:
-            return "Empty control item with id " + self.id.__str__()
+            return f"Empty control item with id {self.id.__str__()}"
 
     def web_id(self):
         if self.variable_property:
-            return "controlitem-" + self.id.__str__() + "-" + self.variable_property.id.__str__()
+            return f"controlitem-{self.id.__str__()}-{self.variable_property.id.__str__()}"
         elif self.variable:
-            return "controlitem-" + self.id.__str__() + "-" + self.variable.id.__str__()
+            return f"controlitem-{self.id.__str__()}-{self.variable.id.__str__()}"
 
     def web_class_str(self):
         if self.variable_property:
-            return 'prop-%d' % self.variable_property_id
+            return f"prop-{self.variable_property_id}"
         elif self.variable:
-            return 'var-%d' % self.variable_id
+            return f"var-{self.variable_id}"
 
     def active(self):
         if self.variable_property:
@@ -684,7 +682,7 @@ class WidgetContent(models.Model):
         return None
 
     def __str__(self):
-        return '%s [%d] %s' % (self.content_model.split('.')[-1], self.content_pk, self.content_str)  # todo add more infos
+        return f"{self.content_model.split('.')[-1]} [{self.content_pk}] {self.content_str}" # todo add more infos
 
 
 class CssClass(models.Model):
@@ -732,7 +730,7 @@ class Widget(models.Model):
             widget_size = "col-xs-12 col-sm-12 col-md-6 col-lg-6"
         elif self.size == 1:
             widget_size = "col-xs-12 col-sm-6 col-md-6 col-lg-3"
-        return 'widget_row_' + str(self.row) + ' widget_col_' + str(self.col) + ' ' + widget_size
+        return f"widget_row_{str(self.row)} widget_col_{str(self.col)} {widget_size}"
 
 
 class View(models.Model):

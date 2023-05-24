@@ -43,10 +43,10 @@ def export_recordeddata_to_file(time_min=None, time_max=None, filename=None, act
 
     if isinstance(time_max, string_types):
         # convert date strings
-        time_max = mktime(datetime.strptime(time_max, "%d-%m-%Y %H:%M:%S").timetuple())
+        time_max = mktime(datetime.strptime(time_max, "%d-%b-%Y %H:%M:%S").timetuple())
     if isinstance(time_min, string_types):
         # convert date strings
-        time_min = mktime(datetime.strptime(time_min, "%d-%m-%Y %H:%M:%S").timetuple())
+        time_min = mktime(datetime.strptime(time_min, "%d-%b-%Y %H:%M:%S").timetuple())
 
     # add default time_min
     if time_max is None:

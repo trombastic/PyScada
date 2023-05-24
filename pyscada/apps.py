@@ -11,11 +11,11 @@ logger = logging.getLogger(__name__)
 
 
 class PyScadaConfig(AppConfig):
-    name = 'pyscada'
-    label = 'pyscada'
+    name = "pyscada"
+    label = "pyscada"
     verbose_name = _("PyScada Core")
     path = os.path.dirname(os.path.realpath(__file__))
-    default_auto_field = 'django.db.models.AutoField'
+    default_auto_field = "django.db.models.AutoField"
 
     def ready(self):
         import pyscada.signals

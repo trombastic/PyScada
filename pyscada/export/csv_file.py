@@ -37,9 +37,11 @@ class ExcelCompatibleCSV:
         # check the data
         # data has to have the same len
         del_keys = []
+
         for key in self.data:
             if len(self.data[key]) != self.data_rows:
                 del_keys.append(key)
+
         for i in del_keys:
             self.data.pop(i, None)
             self.header.pop(i, None)
@@ -48,6 +50,7 @@ class ExcelCompatibleCSV:
         output = zip(*self.data.values())
         # truncate file on first write, otherwise append
         write_mode = 'a' if self.header_is_writen else 'w'
+
         with open(self.filename, write_mode) as f:
             writer = csv.writer(f, dialect=self.dialect)
             if not self.header_is_writen:
