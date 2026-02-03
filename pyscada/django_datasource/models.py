@@ -296,7 +296,7 @@ class DjangoDatabase(models.Model):
             time_max = time.time()
 
         variable_ids = self.datasource.datasource_check(
-            variable_ids, items_as_id=True, ids_model=Variable
+            items=variable_ids, items_as_id=True, ids_model=Variable
         )
         return self._import_model().objects.db_data(
             variable_ids=variable_ids,
@@ -314,6 +314,18 @@ class DjangoDatabase(models.Model):
         return self.write_datapoints(**kwargs)
 
     def write_datapoints(self, items=[], date_saved=None, batch_size=1000, **kwargs):
+        """
+        Args:
+            datapoints:  { variable_id: [[timestamp, value, date_saved]] } with
+                timestamp in s and date_saved as datetime, timestamp in s or None
+            date_saved (datetime, optional): time when the data was saved. Defaults to
+                now()
+            batch_size (int): Number of values to safe in bulk_create at once. Defauls
+                to 1000
+
+        Returns:
+            None
+        """
         data_model = self._import_model()
         items = self.datasource.datasource_check(items)
         recorded_datas = []
@@ -347,15 +359,41 @@ class DjangoDatabase(models.Model):
         for item in items:
             item.date_saved = None
 
-    def write_raw_datapoints(self, datapoints, batch_size=1000, **kwargs):
+    def write_raw_datapoints(self, datapoints: dict, date_saved=None, batch_size=1000):
         """writes raw datapoints to the database in the form
-        { "variable_id": [[timestamp, value, date_saved]] }
+
+        Args:
+            datapoints:  { variable_id: [[timestamp, value, date_saved]] } with
+                timestamp in s and date_saved as datetime, timestamp in s or None
+            date_saved (datetime, optional): time when the data was saved. Defaults to
+                now()
+            batch_size (int): Number of values to safe in bulk_create at once. Defauls
+                to 1000
+
+        Returns:
+            None
         """
         data_model = self._import_model()
         recorded_datas = []
         for variable_id in datapoints.keys():
-            variable = Variable.objects.filter(variable_id=variable_id).first()
+            variable = Variable.objects.filter(pk=variable_id).first()
             for datapoint in datapoints[variable_id]:
+                if len(datapoint)==2:
+                    if date_saved is None:
+                        datapoint.append(now())
+                    else:
+                        datapoint.append(date_saved)
+
+                elif len(datapoint)==3:
+                    if datapoint[2] is None:
+                        if date_saved is None:
+                            datapoint[2]=now()
+                        else:
+                            datapoint[2]=date_saved
+
+                    elif (type(datapoint[2]) is int or type(datapoint[2]) is float):
+                        datapoint[2]=timestamp_to_datetime(datapoint[2])
+
                 rc = data_model.objects.create_data_element_from_variable(
                     variable=variable,
                     value=datapoint[1],
