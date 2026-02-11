@@ -591,4 +591,5 @@
   - moved DjangoDatasource to separate sub app -> Update of settings.py is nessesary, see update.rst
   - migrated from setup.py to pyproject.toml
   - updated device_protocol list to include MQTT and Influxdb plugins
+  - added new cache datasource for variables that need no longterm recording
 

@@ -21,7 +21,7 @@ Sorry a direct upgrade is not possible, you have to install 0.7.x from scratch.
 0.8.x to 0.9x
 -------------
 
-Befor the Upgrade:
+Before the Upgrade:
 
 The folowing lines must be added to the `settings.py` after the `INSTALLED_APPS` section.
 
@@ -40,6 +40,7 @@ After the Upgrade:
 - (optinal) choose a alternative home page by adding `PYSCADA_HOME = "/view/TEST/"` to the `settings.py`
 - (optinal) add `PYSCADA_ALLOW_ANONYMOUS = True` to allow access to the pyscada hmi without login or add `PYSCADA_ALLOW_ANONYMOUS_WRITE = True` to allow write access to the pyscada hmi without login
 	- Managing anonymous user display permission for IHM objects (view, page, widget, chart...) is done in the admin panel using the "Group Display Permission" -> "Unauthenticated users" configuration
+- setup a cacheing backend for using the cache_datasource (e.g. Redis) https://docs.djangoproject.com/en/5.2/topics/cache/
 - Run the folowing command in your pyscada root (where `manage.py` is located) in the pyscada venv
 
 ::
