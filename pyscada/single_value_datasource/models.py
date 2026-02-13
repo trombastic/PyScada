@@ -34,7 +34,12 @@ class DjangoSingleValue(models.Model):
         """
         if variable is None:
             logger.info(
-                "No variable defined for DjangoCache last_datapoint function"
+                "No variable defined for DjangoSingleValue last_datapoint function"
+            )
+            return None
+        if not hasattr(variable, "singlevaluerecordeddata"):
+            logger.info(
+                "variable has no singlevaluerecordeddata attr"
             )
             return None
         recorded_data = variable.singlevaluerecordeddata
@@ -126,11 +131,11 @@ class DjangoSingleValue(models.Model):
             logger.debug(f"{item} has {len(item.cached_values_to_write)} to write.")
             if not hasattr(item, "date_saved") or item.date_saved is None:
                 item.date_saved = date_saved
-            
+
             recorded_data = None
             if hasattr(recorded_data, "singlevaluerecordeddata"):
                 recorded_data = item.singlevaluerecordeddata
-            
+
             if recorded_data is None:
                 recorded_data = SingleValueRecordedData(variable=item)
                 
@@ -139,6 +144,7 @@ class DjangoSingleValue(models.Model):
                 date_saved=item.date_saved,
                 ):
                 recorded_data.save()
+                item.refresh_from_db()
             
             item.date_saved = None
 
